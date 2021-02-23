@@ -78,17 +78,23 @@ def substitute(sents, rule):
     rule_text = rule[1][0] + " " + rule[1][1]
     rule_text_regex = rule_text + r"\s"
     #rule_text_regex = check(rule_text_regex)
-    print(rule_text)
+    #print(rule_text)
     #print(rule_text)
     for i in range(0, len(sents)-1):
         #print(sent)
         if rule_text in sents[i]:
             #print(rule[0])
             #sent.replace(rule_text, rule[0])
-            if "$" in rule_text:
-                sents[i].replace("in np$", rule[0])
-                print(sents[i])
+            if "$" or "*" in rule_text:
+                #print("Somethin in the way")
+                #print(rule[0])
+                #print(type(sents[i]))
+                #x = str(sents[i])
+                print(rule_text)
+                sents[i] = sents[i].replace(rule_text, rule[0])
             else:
+                #print(rule[0])
+                #print(sents[i])
                 sents[i] = re.sub(rule_text_regex, rule[0] + " ", sents[i])
             #print(sent)
 
@@ -132,10 +138,10 @@ def run(path):
         if not check_terminals(current_tags, all_tags):
             has_terminals = False
         
-        if "$" in rule[1][1]:
+        #if "$" in rule[1][1]:
         #    for sent in current_sents:
         #        print(sent)
-            has_terminals = False
+        #   has_terminals = False
 
         print(f"{rule[0]} => {rule[1]}")
         cpt+=1
