@@ -77,7 +77,7 @@ def substitute(sents, rule):
 
     rule_text = rule[1][0] + " " + rule[1][1]
     rule_text_regex = rule_text + r"\s"
-    rule_text_regex = check(rule_text_regex)
+    #rule_text_regex = check(rule_text_regex)
     print(rule_text)
     #print(rule_text)
     for i in range(0, len(sents)-1):
@@ -86,7 +86,8 @@ def substitute(sents, rule):
             #print(rule[0])
             #sent.replace(rule_text, rule[0])
             if "$" in rule_text:
-                print(rule_text_regex)
+                sents[i].replace("in np$", rule[0])
+                print(sents[i])
             else:
                 sents[i] = re.sub(rule_text_regex, rule[0] + " ", sents[i])
             #print(sent)
