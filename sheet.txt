@@ -22,3 +22,5 @@ n-grams, where n is the length of the sentence being processed.
 The input of this step is the set of POStagged sentences (corpus) and the output is the collection
 of all extracted n-grams.
 
+####################################### Frequency distribution #################################################
+
