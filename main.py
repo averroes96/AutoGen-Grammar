@@ -1,7 +1,7 @@
 from nltk import ngrams
 from nltk.corpus import brown
 from nltk import FreqDist,defaultdict
-import os,re
+import os,re,time
 from operator import itemgetter
 
 def to_POSTagged_corpus(corpus): # Function takes as a parameter an organized corpus and turn it into a tagged one string
@@ -45,6 +45,7 @@ def extract_ngrams(sents):
     for sentence in sents:
         for i in range(2, len(sentence) - 1):
             mygrams += ngrams(sentence.split(), i)
+            
 
     return mygrams
 
@@ -62,9 +63,21 @@ def get_sents(path):
 
     return sents
 
+def check(text):
+
+    tmp = text
+    if "$" in tmp:
+        print("replacing dollar sign")
+        re.sub(r"[$]", "", tmp)
+
+    print(tmp)
+    return tmp
+
 def substitute(sents, rule):
 
     rule_text = rule[1][0] + " " + rule[1][1]
+    rule_text_regex = rule_text + r"\s"
+    rule_text_regex = check(rule_text_regex)
     print(rule_text)
     #print(rule_text)
     for i in range(0, len(sents)-1):
@@ -72,7 +85,10 @@ def substitute(sents, rule):
         if rule_text in sents[i]:
             #print(rule[0])
             #sent.replace(rule_text, rule[0])
-            sents[i] = re.sub(rule_text, rule[0], sents[i])
+            if "$" in rule_text:
+                print(rule_text_regex)
+            else:
+                sents[i] = re.sub(rule_text_regex, rule[0] + " ", sents[i])
             #print(sent)
 
     return sents
@@ -110,13 +126,19 @@ def run(path):
         fd = FreqDist(extracted_grams)
         rule = ["NT" + str(cpt), fd.max()]
         rules[rule[0]] = rule[1]
-        print(f"{rule[0]} => {rule[1]}")
         current_sents = substitute(current_sents, rule)
         current_tags = get_current_tags(current_sents)
         if not check_terminals(current_tags, all_tags):
             has_terminals = False
+        
+        if "$" in rule[1][1]:
+        #    for sent in current_sents:
+        #        print(sent)
+            has_terminals = False
 
+        print(f"{rule[0]} => {rule[1]}")
         cpt+=1
+        print("=" * 96)
 
     return rules
 
@@ -128,8 +150,6 @@ def run(path):
 #print([[(token,freq) for (token, freq) in sorted_tag_counts[:20]]])
 
 #print(tags)
-
-#extracted_grams = extract_ngrams(get_sents("brown\\ca01"))
 
 extracted_rules = run("brown\\ca01")
 
