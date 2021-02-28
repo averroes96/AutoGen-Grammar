@@ -1,13 +1,33 @@
-import nltk
-from nltk import ngrams
+import sys
+import random
+from PySide6 import QtCore, QtWidgets, QtGui
 
-sentence = 'this is a foo bar sentences and i want to ngramize it'
+class MyWidget(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
 
-n = 6
-mygrams = []
+        self.hello = ["Hallo Welt", "Hei maailma", "Hola Mundo", "Привет мир"]
 
-for i in range(2, len(sentence) - 1):
-    mygrams += ngrams(sentence.split(), i)
+        self.button = QtWidgets.QPushButton("Click me!")
+        self.text = QtWidgets.QLabel("Hello World",
+                                     alignment=QtCore.Qt.AlignCenter)
 
-for grams in mygrams:
-  print(grams)
+        self.layout = QtWidgets.QVBoxLayout(self)
+        self.layout.addWidget(self.text)
+        self.layout.addWidget(self.button)
+
+        self.button.clicked.connect(self.magic)
+
+    @QtCore.Slot()
+    def magic(self):
+        self.text.setText(random.choice(self.hello))
+
+
+if __name__ == "__main__":
+    app = QtWidgets.QApplication([])
+
+    widget = MyWidget()
+    widget.resize(800, 600)
+    widget.show()
+
+    sys.exit(app.exec_())

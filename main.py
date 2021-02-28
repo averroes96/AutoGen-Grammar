@@ -28,18 +28,22 @@ def get_corpus_tags(path)->str:
 
     return list(fd)
 
-def extract_ngrams(sents):
+
+# Function to extract the all possible ngrams from a list of sents
+def extract_ngrams(sents)->list:
 
     mygrams = []
     for sentence in sents:
         for i in range(2, len(sentence) - 1):
             mygrams += ngrams(sentence.split(), i)
             
+            # I want to go to school
+            # I want 
 
     return mygrams
 
-
-def get_sents(path):
+# get all the sentences of a file | path:str = path of the file
+def get_sents(path)->str:
 
     file = open(path).read().strip().split("\n")
     sents = []
@@ -52,16 +56,7 @@ def get_sents(path):
 
     return sents
 
-def check(text):
-
-    tmp = text
-    if "$" in tmp:
-        print("replacing dollar sign")
-        re.sub(r"[$]", "", tmp)
-
-    print(tmp)
-    return tmp
-
+# Substitution, replace in a list of sentences the tag by the rule name (needs revision)
 def substitute(sents, rule):
 
     rule_text = rule[1][0] + " " + rule[1][1]
@@ -78,6 +73,7 @@ def substitute(sents, rule):
 
     return sents
 
+# get the current tags
 def get_current_tags(sents):
 
     tags = ""
@@ -124,7 +120,11 @@ def run(path):
 
     return rules
 
-extracted_rules = run("brown\\ca01")
+extracted_rules = extract_ngrams(get_sents("brown\\ca01"))
 
-for key,val in extracted_rules.items():
-    print(f"{key} => {val}")
+print(len(extracted_rules))
+fd = FreqDist(extracted_rules)
+
+print(fd.freq(("at", "nn")))
+print(fd[("at", "nn")])
+print(fd.max())
