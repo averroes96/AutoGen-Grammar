@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block body%}
+<h2>{{ head }}</h2>
+<p>{{ description }}</p>
+
+{% for skill in skills %}
+    <div>{{skill[0]}} => {{skill[1]}}</div>
+{% endfor %}
+{% endblock %}
