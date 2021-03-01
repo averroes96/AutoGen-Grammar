@@ -1,0 +1,59 @@
+#:import utils kivy.utils
+<Button>
+    font_size:32
+    size_hint: (0.5, 0.5)
+    pos_hint: {"center_x": 0.5}
+    background_normal: ""
+
+<TextInput>
+    background_color: utils.get_color_from_hex("#d2d4c8")
+    pos_hint: {"center_x": 0.5}
+
+<Label>
+    background_color: (0, 0, 0,0)
+    canvas.before:
+        Color:
+            rgba: self.background_color
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    color: (136, 150, 150, 1)
+    bold: True
+<MyLayout>
+    original:original
+    generated:generated
+    submit:submit
+    clear:clear
+    BoxLayout:
+        size: root.width, root.height
+        orientation: "vertical"
+        spacing: 16
+        padding: 32
+
+        Image:
+            source: "bot_simple.png"
+            allow_stretch: False
+            keep_ratio: True
+        BoxLayout:
+            orientation: "vertical"
+            Label:
+                text: "Enter a sentence"
+            TextInput:
+                id:original
+                multiline:False
+        Label:
+            id:generated
+            text: "Enter a sentence and click Generate Button to auto generate grammar"
+        Button:
+            id:submit
+            text:"Generate"
+            background_color: utils.get_color_from_hex("#5F7470")
+            color: (224/255, 226/255, 219/255,1)
+            on_press: root.onAction()
+
+        Button:
+            id:clear
+            text:"Clear"
+            background_color: utils.get_color_from_hex("#889696")
+            color: (224/255, 226/255, 219/255,1)
+            on_press: root.onClear()
