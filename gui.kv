@@ -1,4 +1,13 @@
 #:import utils kivy.utils
+#:import Factory kivy.factory.Factory
+<MyPopup@Popup>
+    title: "Program isn't implemented yet :D"
+    size_hint: 0.6, 0.2
+    pos_hint: {"x": 0.2, "top": 0.67}
+    # Button:
+    #     text: "Close"
+    #     on_release: root.dismiss()
+
 <Button>
     font_size:32
     size_hint: (0.5, 0.5)
@@ -19,41 +28,75 @@
             pos: self.pos
     color: (136, 150, 150, 1)
     bold: True
+
 <MyLayout>
+    id:main_layout
     original:original
     generated:generated
     submit:submit
     clear:clear
-    BoxLayout:
-        size: root.width, root.height
+
+    Accordion:
         orientation: "vertical"
-        spacing: 16
-        padding: 32
+        size: root.width, root.height
+        spacing: 8
+        padding: 8
 
-        Image:
-            source: "bot_simple.png"
-            allow_stretch: False
-            keep_ratio: True
-        BoxLayout:
-            orientation: "vertical"
-            Label:
-                text: "Enter a sentence"
-            TextInput:
-                id:original
-                multiline:False
-        Label:
-            id:generated
-            text: "Enter a sentence and click Generate Button to auto generate grammar"
-        Button:
-            id:submit
-            text:"Generate"
-            background_color: utils.get_color_from_hex("#5F7470")
-            color: (224/255, 226/255, 219/255,1)
-            on_press: root.onAction()
+        AccordionItem:
+            title: "Options"
+            BoxLayout:
+                orientation: "horizontal"
+                size_hint: (0.32,0.64)
+                Button:
+                    font_size:16
+                    id:open_file_chooser
+                    text:"Open corpus"
+                    background_color: utils.get_color_from_hex("#5F7470")
+                    color: (224/255, 226/255, 219/255,1)
 
-        Button:
-            id:clear
-            text:"Clear"
-            background_color: utils.get_color_from_hex("#889696")
-            color: (224/255, 226/255, 219/255,1)
-            on_press: root.onClear()
+            FileChooserIconView:
+                id:file_chooser
+                on_selection: main_layout.selected(file_chooser.selection)
+
+        AccordionItem:
+            title: "Application"
+            BoxLayout:
+                orientation: "vertical"
+                spacing: 8
+                padding: 8
+
+                Image:
+                    id:icon
+                    source: "bot_simple.png"
+                    allow_stretch: False
+                    keep_ratio: True
+
+                BoxLayout:
+                    orientation: "vertical"
+                    Label:
+                        text: "Enter a sentence"
+                    TextInput:
+                        id:original
+                        multiline:False
+                    Label:
+                        id:suggestions
+                        text: ""
+                        text_size: self.size
+                        halign: "center"
+                        valign: "middle"
+                Label:
+                    id:generated
+                    text: "Enter a sentence and click Generate Button to auto generate grammar"
+                Button:
+                    id:submit
+                    text:"Generate"
+                    background_color: utils.get_color_from_hex("#5F7470")
+                    color: (224/255, 226/255, 219/255,1)
+                    on_release: Factory.MyPopup().open()
+
+                Button:
+                    id:clear
+                    text:"Clear"
+                    background_color: utils.get_color_from_hex("#889696")
+                    color: (224/255, 226/255, 219/255,1)
+                    on_press: root.onClear()
