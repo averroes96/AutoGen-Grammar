@@ -1,0 +1,124 @@
+#:import utils kivy.utils
+#:import Factory kivy.factory.Factory
+
+MyManager:
+    MainScreen:
+    SecondScreen:
+
+<MyPopup@Popup>
+    title: "Program isn't implemented yet :D"
+    size_hint: 0.6, 0.2
+    pos_hint: {"x": 0.2, "top": 0.67}
+    # Button:
+    #     text: "Close"
+    #     on_release: root.dismiss()
+
+<Button>
+    font_size:32
+    size_hint: (0.32, 0.32)
+    pos_hint: {"center_x": 0.5}
+    background_normal: ""
+
+<TextInput>
+    background_color: utils.get_color_from_hex("#d2d4c8")
+    pos_hint: {"center_x": 0.5}
+
+<Label>
+    background_color: (0, 0, 0,0)
+    canvas.before:
+        Color:
+            rgba: self.background_color
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    color: (136, 150, 150, 1)
+    bold: True
+
+
+<MainScreen>:
+    name: "main"
+    id: main_screen
+    BoxLayout:
+        orientation: "vertical"
+        spacing: 8
+        padding: 16
+
+        BoxLayout:
+            orientation: "horizontal"
+            AnchorLayout:
+                anchor_x: "left"
+                anchor_y: "top"
+                Button:
+                    id:submit
+                    text:"Generate"
+                    background_color: utils.get_color_from_hex("#5F7470")
+                    color: (224/255, 226/255, 219/255,1)
+                    on_release:
+                        Factory.MyPopup().open()
+                        root.animate_it(self)
+                        if root.ids.icon.source == "bot_sad.png": root.ids.icon.source = "bot_simple.png"
+                        else: root.ids.icon.source = "bot_sad.png"
+
+            AnchorLayout:
+                anchor_x: "right"
+                anchor_y: "top"
+
+                Button:
+                    id:clear
+                    text:"Clear"
+                    background_color: utils.get_color_from_hex("#889696")
+                    color: (224/255, 226/255, 219/255,1)
+                    on_release:
+                        root.animate_it(self)
+                        app.root.current = "second"
+                        root.manager.transition.direction = "up"
+        Image:
+            id:icon
+            source: "bot_simple.png"
+            allow_stretch: False
+            keep_ratio: True
+
+        BoxLayout:
+            orientation: "vertical"
+            Label:
+                text: "Enter a sentence"
+            TextInput:
+                id:original
+                multiline:False
+                padding: 8
+                foreground_color: (95/255, 116/255, 112/255, 1)
+                hint_text: "Enter a sentence and click Generate Button to auto generate grammar"
+                hint_text_color: (95/255, 116/255, 112/255, 0.6)
+            Label:
+                id:suggestions
+                text: ""
+                text_size: self.size
+                halign: "center"
+                valign: "middle"
+        Label:
+            id:generated
+            text: "Enter a sentence and click Generate Button to auto generate grammar"
+
+<SecondScreen>
+    name: "second"
+    BoxLayout:
+        spacing: 16
+        padding: 8
+        orientation: "vertical"
+        FileChooserListView:
+            id:file_chooser
+            on_selection:
+                app.root.get_screen("main").selected(file_chooser.selection)
+                if len(self.selection) > 0: confirm.disabled = False
+                else: confirm.disabled = True
+        Button:
+            id:confirm
+            text:"Confirm"
+            background_color: utils.get_color_from_hex("#889696")
+            color: (224/255, 226/255, 219/255,1)
+            size_hint: (0.16, 0.08)
+            font_size:16
+            disabled: True
+            on_release:
+                app.root.current = "main"
+                root.manager.transition.direction = "down"
