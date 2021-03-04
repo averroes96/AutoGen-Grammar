@@ -45,6 +45,7 @@ MyManager:
 
         BoxLayout:
             orientation: "horizontal"
+            size_hint: (0.5,0.5)
             AnchorLayout:
                 anchor_x: "left"
                 anchor_y: "top"
@@ -60,12 +61,13 @@ MyManager:
                         else: root.ids.icon.source = "bot_sad.png"
 
             AnchorLayout:
-                anchor_x: "right"
+                anchor_x: "left"
                 anchor_y: "top"
 
                 Button:
                     id:clear
-                    text:"Clear"
+                    text:"Import corpus"
+                    font_size:16
                     background_color: utils.get_color_from_hex("#889696")
                     color: (224/255, 226/255, 219/255,1)
                     on_release:

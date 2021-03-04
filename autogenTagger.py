@@ -1,8 +1,18 @@
 from pickle import dump
 from nltk.corpus import brown
-from nltk import UnigramTagger,DefaultTagger,BigramTagger
+from nltk import UnigramTagger, DefaultTagger, BigramTagger, RegexpTagger
 from glob import glob
 
+patterns = [
+ (r".*ing$", "VBG"), # gerunds
+ (r".*ed$", "VBD"), # simple past
+ (r".*es$", "VBZ"), # 3rd singular present
+ (r".*ould$", "MD"), # modals
+ (r".*\"s$", "NN$"), # possessive nouns
+ (r".*s$", "NNS"), # plural nouns
+ (r"^-?[0-9]+(.[0-9]+)?$", "CD"), # cardinal numbers
+ (r".*", "NN") # nouns (default)
+ ]
 
 # Get all the sentences of a certain corpus | used for separated corpus like brown
 def get_sents(path)->str:
@@ -54,11 +64,21 @@ def train(tagged_sents):
     unigram_default_tagger = UnigramTagger(tagged_sents, backoff=default_tagger) # Unigram tagger using default tagger as a backoff
     bigram_unigram_default_tagger = BigramTagger(tagged_sents,backoff=unigram_default_tagger)  # Bigram tagger using unigram regex tagger as a backoff
 
+    return bigram_unigram_default_tagger
+
+def save(tagger):
+    
     output = open("tagger.pkl", "wb")
-    dump(bigram_unigram_default_tagger, output, -1)
+    dump(tagger, output, -1)
     output.close()
 
-    return bigram_unigram_default_tagger
+def load(path):
+
+    input = open(path, "rb")
+    tagger = load(input)
+    input.close()
+
+    return tagger
 
 # Evaluate a model based on the given test dataset 
 def evaluate(model, test):
@@ -74,3 +94,5 @@ def evaluate(model, test):
 # testing_tagged_sents = tagged_sents(get_all_sents(testing_data))
 
 # tagger = train(training_tagged_sents)    
+
+# print(evaluate(tagger, testing_tagged_sents))
