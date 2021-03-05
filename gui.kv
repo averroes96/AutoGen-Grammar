@@ -1,40 +1,47 @@
 #:import utils kivy.utils
 #:import Factory kivy.factory.Factory
-<MyPopup@Popup>
-    title: "Program isn't implemented yet :D"
-    size_hint: 0.6, 0.2
-    pos_hint: {"x": 0.2, "top": 0.67}
-    # Button:
-    #     text: "Close"
-    #     on_release: root.dismiss()
 
 <Button>
     font_size:32
     size_hint: (0.5, 0.5)
-    pos_hint: {"center_x": 0.5}
-    background_normal: ""
+    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+
+<ImportText>
+    title: "Import text file"
+    size_hint: 0.70, 0.70
+    pos_hint: {"x": 0.15, "top": 0.85}
+    BoxLayout:
+        select_text: select_text
+        text_chooser: text_chooser
+        orientation: "vertical"
+        spacing: 8
+
+        Label:
+            text: "The imported file must be a text file"
+            size_hint: (1, .2)
+        FileChooserListView:
+            id: text_chooser
+            filters: ["*.txt"]
+            size_hint: (1, .7)
+        Button:
+            id: select_text
+            size_hint: (1, .2)
+            text: "SELECT"
+            on_release: root.load(text_chooser.selection)
+            disabled: True if text_chooser.selection==[] else False
 
 <TextInput>
     background_color: utils.get_color_from_hex("#d2d4c8")
     pos_hint: {"center_x": 0.5}
 
 <Label>
-    background_color: (0, 0, 0,0)
-    canvas.before:
-        Color:
-            rgba: self.background_color
-        Rectangle:
-            size: self.size
-            pos: self.pos
-    color: (136, 150, 150, 1)
     bold: True
 
 <MyLayout>
     id:main_layout
     original:original
-    generated:generated
-    submit:submit
-    clear:clear
+    tagger: tagger
+    tags_wrapper: tags_wrapper
 
     Accordion:
         orientation: "vertical"
@@ -44,19 +51,6 @@
 
         AccordionItem:
             title: "Options"
-            BoxLayout:
-                orientation: "horizontal"
-                size_hint: (0.32,0.64)
-                Button:
-                    font_size:16
-                    id:open_file_chooser
-                    text:"Open corpus"
-                    background_color: utils.get_color_from_hex("#5F7470")
-                    color: (224/255, 226/255, 219/255,1)
-
-            FileChooserIconView:
-                id:file_chooser
-                on_selection: main_layout.selected(file_chooser.selection)
 
         AccordionItem:
             title: "Application"
@@ -70,33 +64,56 @@
                     source: "bot_simple.png"
                     allow_stretch: False
                     keep_ratio: True
+                    size_hint:(1, 0.2)
 
                 BoxLayout:
-                    orientation: "vertical"
-                    Label:
-                        text: "Enter a sentence"
-                    TextInput:
-                        id:original
-                        multiline:False
-                    Label:
-                        id:suggestions
-                        text: ""
-                        text_size: self.size
-                        halign: "center"
-                        valign: "middle"
-                Label:
-                    id:generated
-                    text: "Enter a sentence and click Generate Button to auto generate grammar"
-                Button:
-                    id:submit
-                    text:"Generate"
-                    background_color: utils.get_color_from_hex("#5F7470")
-                    color: (224/255, 226/255, 219/255,1)
-                    on_release: Factory.MyPopup().open()
-
-                Button:
-                    id:clear
-                    text:"Clear"
-                    background_color: utils.get_color_from_hex("#889696")
-                    color: (224/255, 226/255, 219/255,1)
-                    on_press: root.onClear()
+                    orientation: "horizontal"
+                    BoxLayout:
+                        orientation: "vertical"
+                        spacing: 4
+                        TextInput:
+                            id:original
+                            multiline:True
+                            size_hint: (1, .75)
+                            padding: 8
+                            foreground_color: (95/255, 116/255, 112/255, 1)
+                            hint_text: "Enter a sentence and click Generate Button to auto generate grammar"
+                            hint_text_color: (95/255, 116/255, 112/255, 0.6)
+                        BoxLayout:
+                            orientation: "vertical"
+                            size_hint: (1, .25)
+                            Label:
+                                text: "or import a text file for analysis"
+                                background_color: (0, 0, 0,0)
+                                canvas.before:
+                                    Color:
+                                        rgba: self.background_color
+                                    Rectangle:
+                                        size: self.size
+                                        pos: self.pos
+                                color: (136, 150, 150, 1)
+                            Button:
+                                id: import_text
+                                text:"Import"
+                                font_size: 16
+                                size_hint: (0.24, 0.67)
+                                background_color: utils.get_color_from_hex("#5F7470")
+                                color: (224/255, 226/255, 219/255,1)
+                                on_release: root.open_popup()
+                    ScrollView:
+                        id: tags_wrapper
+                        Label:
+                            id: tagger
+                            text: "Tagged text will be shown here"
+                            text_size: root.tags_wrapper.width, None
+                            size: self.texture_size
+                            valign: "middle"
+                            halign: "center"
+                            background_color: (0, 0, 0,0)
+                            canvas.before:
+                                Color:
+                                    rgba: self.background_color
+                                Rectangle:
+                                    size: self.size
+                                    pos: self.pos
+                            color: (136, 150, 150, 1)

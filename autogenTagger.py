@@ -1,4 +1,4 @@
-from pickle import dump
+from pickle import dump,load
 from nltk.corpus import brown
 from nltk import UnigramTagger, DefaultTagger, BigramTagger, RegexpTagger
 from glob import glob
@@ -72,7 +72,7 @@ def save(tagger):
     dump(tagger, output, -1)
     output.close()
 
-def load(path):
+def load_tagger(path):
 
     input = open(path, "rb")
     tagger = load(input)
