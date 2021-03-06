@@ -1,7 +1,5 @@
 from pickle import dump,load
-from nltk.corpus import brown
-from nltk import UnigramTagger, DefaultTagger, BigramTagger, RegexpTagger
-from glob import glob
+from nltk import UnigramTagger, DefaultTagger, BigramTagger
 
 patterns = [
  (r".*ing$", "VBG"), # gerunds
@@ -13,49 +11,6 @@ patterns = [
  (r"^-?[0-9]+(.[0-9]+)?$", "CD"), # cardinal numbers
  (r".*", "NN") # nouns (default)
  ]
-
-# Get all the sentences of a certain corpus | used for separated corpus like brown
-def get_sents(path)->str:
-
-    file = open(path)
-    file_list = file.read().strip().split("\n")
-    sents = []
-
-    for line in file_list:
-        if line.strip() != "":
-            sents.append(line)
-
-    file.close()
-
-    return sents
-
-# Get all the sentences of the entire corpus | used for separated corpus like brown
-def get_all_sents(files):
-
-    all_sents = []
-    for file in files:
-        all_sents += get_sents(file)
-
-    return all_sents
-
-# Get the tagged words of a given sentence
-def tagged_words(sent) -> str:
-    tokens = sent.split()
-    temp = []
-    for token in tokens:
-        word, tag = token.rsplit("/",1)
-        temp.append((word, tag))
-
-    return temp
-
-# Get the tagged sentences of a given sentences
-def tagged_sents(sents) -> str:
-
-    tagged_sents = []
-    for sent in sents:
-        tagged_sents.append(tagged_words(sent))
-
-    return tagged_sents
  
 # Train model on te given tagged sentence
 def train(tagged_sents):
@@ -66,7 +21,7 @@ def train(tagged_sents):
 
     return bigram_unigram_default_tagger
 
-def save(tagger):
+def save_tagger(tagger):
     
     output = open("tagger.pkl", "wb")
     dump(tagger, output, -1)
