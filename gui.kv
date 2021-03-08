@@ -5,6 +5,54 @@
     font_size:32
     size_hint: (0.5, 0.5)
     pos_hint: {"center_x": 0.5, "center_y": 0.5}
+    background_normal: ""
+
+<ResultBL@RecycleKVIDsDataViewBehavior+BoxLayout>:
+    orientation: "vertical"
+    Splitter:
+    Label:
+        id: title
+        text_size: root.width, None
+        size: self.texture_size
+        valign: "middle"
+        halign: "center"
+        background_color: (0, 0, 0,0)
+        canvas.before:
+            Color:
+                rgba: self.background_color
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        color: (136, 150, 150, 1)
+    Label:
+        id: original_sent
+        text_size: root.width, None
+        size: self.texture_size
+        valign: "middle"
+        halign: "center"
+        background_color: (0, 0, 0,0)
+        canvas.before:
+            Color:
+                rgba: self.background_color
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        color: (136, 150, 150, 1)
+    Label:
+        id: analysed_sent
+        markup: True
+        text_size: root.width, None
+        size: self.texture_size
+        valign: "middle"
+        halign: "center"
+        background_color: (0, 0, 0,0)
+        canvas.before:
+            Color:
+                rgba: self.background_color
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        color: (136, 150, 150, 1)
 
 <ImportText>
     title: "Import text file"
@@ -27,12 +75,36 @@
             id: select_text
             size_hint: (1, .2)
             text: "SELECT"
+            background_color: utils.get_color_from_hex("#5F7470")
+            color: (224/255, 226/255, 219/255,1)
             on_release: root.load(text_chooser.selection)
             disabled: True if text_chooser.selection==[] else False
 
+<ImportCorpus>
+    title: "Import a corpus"
+    size_hint: 0.70, 0.70
+    pos_hint: {"x": 0.15, "top": 0.85}
+    BoxLayout:
+        select_corpus: select_corpus
+        corpus_chooser: corpus_chooser
+        orientation: "vertical"
+        spacing: 8
+
+        FileChooserListView:
+            id: corpus_chooser
+            size_hint: (1, .8)
+        Button:
+            id: select_corpus
+            size_hint: (1, .2)
+            text: "SELECT"
+            background_color: utils.get_color_from_hex("#5F7470")
+            color: (224/255, 226/255, 219/255,1)
+            on_release: root.load_corpus(corpus_chooser.selection)
+            disabled: True if corpus_chooser.selection==[] else False
+
 <TextInput>
     background_color: utils.get_color_from_hex("#d2d4c8")
-    pos_hint: {"center_x": 0.5}
+    pos_hint: {"center_x": 0.5, "center_y": 0.5}
 
 <Label>
     bold: True
@@ -40,8 +112,12 @@
 <MyLayout>
     id:main_layout
     original:original
-    tagger: tagger
-    tags_wrapper: tags_wrapper
+    # tagger: tagger
+    #tags_wrapper: tags_wrapper
+    sents_rv: sents_rv
+    options:options
+    application: application
+    analysisBtn: analysisBtn
 
     Accordion:
         orientation: "vertical"
@@ -51,69 +127,128 @@
 
         AccordionItem:
             title: "Options"
+            id:options
 
+            BoxLayout:
+                id: optionsBL
+                orientation: "vertical"
+                padding: 8
+                spacing: 8
+                Label:
+                    markup: True
+                    text: "[color=ff0000]========== Note =========[/color]"
+                    size_hint: (1, 0.1)
+                Label:
+                    text: '''The imported Corpus must be tagged and bla bla bla...Once the training starts the old grammar will be lost'''
+                    size_hint: (1, 0.2)
+                    background_color: (0, 0, 0,0)
+                    canvas.before:
+                        Color:
+                            rgba: self.background_color
+                        Rectangle:
+                            size: self.size
+                            pos: self.pos
+                    color: (136, 150, 150, 1)
+                    size_hint: (1, 0.1)
+                Button:
+                    text: "IMPORT & TRAIN"
+                    font_size: 14
+                    size_hint: (.20, .1)
+                    background_color: utils.get_color_from_hex("#5F7470")
+                    color: (224/255, 226/255, 219/255,1)
+                    on_release: root.open_corpus_popup()
+                BoxLayout:
+                    orientation: "vertical"
+                    size_hint: (1, 0.6)
         AccordionItem:
             title: "Application"
+            id: application
             BoxLayout:
                 orientation: "vertical"
                 spacing: 8
-                padding: 8
-
-                Image:
-                    id:icon
-                    source: "bot_simple.png"
-                    allow_stretch: False
-                    keep_ratio: True
-                    size_hint:(1, 0.2)
+                padding: 16
 
                 BoxLayout:
                     orientation: "horizontal"
+                    size_hint:(1, 0.8)
+                    spacing: 8
                     BoxLayout:
                         orientation: "vertical"
-                        spacing: 4
+                        size_hint:(0.75, 1)
                         TextInput:
                             id:original
                             multiline:True
-                            size_hint: (1, .75)
                             padding: 8
                             foreground_color: (95/255, 116/255, 112/255, 1)
-                            hint_text: "Enter a sentence and click Generate Button to auto generate grammar"
-                            hint_text_color: (95/255, 116/255, 112/255, 0.6)
-                        BoxLayout:
-                            orientation: "vertical"
-                            size_hint: (1, .25)
-                            Label:
-                                text: "or import a text file for analysis"
-                                background_color: (0, 0, 0,0)
-                                canvas.before:
-                                    Color:
-                                        rgba: self.background_color
-                                    Rectangle:
-                                        size: self.size
-                                        pos: self.pos
-                                color: (136, 150, 150, 1)
-                            Button:
-                                id: import_text
-                                text:"Import"
-                                font_size: 16
-                                size_hint: (0.24, 0.67)
-                                background_color: utils.get_color_from_hex("#5F7470")
-                                color: (224/255, 226/255, 219/255,1)
-                                on_release: root.open_popup()
-                    ScrollView:
-                        id: tags_wrapper
-                        Label:
-                            id: tagger
-                            text: "Tagged text will be shown here"
-                            text_size: root.tags_wrapper.width, None
-                            size: self.texture_size
-                            valign: "middle"
-                            halign: "center"
-                            background_color: (0, 0, 0,0)
-                            canvas.before:
-                                Color:
-                                    rgba: self.background_color
-                                Rectangle:
-                                    size: self.size
-                                    pos: self.pos
-                            color: (136, 150, 150, 1)
+                            hint_text: "Enter a text and click Generate Button to auto generate grammar"
+                            hint_text_color: (95/255, 116/255, 112/255, 0.7)
+                        RecycleView:
+                            id: sents_rv
+                            viewclass: "ResultBL"
+                            RecycleBoxLayout:
+                                orientation: "vertical"
+                                default_size: None, 75
+                                default_size_hint: 1, None
+                                size_hint_y: None
+                                height: self.minimum_height
+                    BoxLayout:
+                        orientation: "vertical"
+                        spacing: 16
+                        size_hint:(0.25, 1)
+                        Button:
+                            id: analysisBtn
+                            text:"ANALYSIS"
+                            size_hint: (0.8, 0.15)
+                            font_size: 16
+                            background_color: utils.get_color_from_hex("#5F7470")
+                            color: (224/255, 226/255, 219/255,1)
+                            on_release: root.analysis()
+                        Button:
+                            id: clearBtn
+                            text:"CLEAR"
+                            font_size: 16
+                            size_hint: (0.8, 0.15)
+                            background_color: utils.get_color_from_hex("#5F7470")
+                            color: (224/255, 226/255, 219/255,1)
+                            on_release: root.clear()
+                        Button:
+                            id: import_text
+                            text:"IMPORT"
+                            font_size: 16
+                            size_hint: (0.8, 0.15)
+                            background_color: utils.get_color_from_hex("#5F7470")
+                            color: (224/255, 226/255, 219/255,1)
+                            on_release: root.open_popup()
+                        Image:
+                            id:icon
+                            source: "bot_simple.png"
+                            allow_stretch: False
+                            keep_ratio: True
+                            size_hint:(1, 0.55)
+
+                    # ScrollView:
+                    #     id: tags_wrapper
+                    #     RecycleView:
+                    #         id: sents_rv
+                    #         viewclass: "Label"
+                    #         RecycleBoxLayout:
+                    #             orientation: "vertical"
+                    #             default_size: None, 100
+                    #             default_size_hint: 1, None
+                    #             size_hint_y: None
+                    #             height: self.minimum_height
+                        # Label:
+                        #     id: tagger
+                        #     text: "Tagged text will be shown here"
+                        #     text_size: root.tags_wrapper.width, None
+                        #     size: self.texture_size
+                        #     valign: "middle"
+                        #     halign: "center"
+                        #     background_color: (0, 0, 0,0)
+                        #     canvas.before:
+                        #         Color:
+                        #             rgba: self.background_color
+                        #         Rectangle:
+                        #             size: self.size
+                        #             pos: self.pos
+                        #     color: (136, 150, 150, 1)
