@@ -1,4 +1,5 @@
 from nltk import FreqDist
+from nltk import ngrams
 import re
 
 def only_tags(sent) -> str: # Function to get only the tags from a tagged sentence
@@ -41,9 +42,14 @@ def get_sents(path, sep = "\n")-> str:
 
     corpus = open(path, "r")
     sents = re.split(sep, open(path).read().strip())
+    print(sents[-1])
     corpus.close()
 
     return sents
+
+def get_text_sents(text, sep = "\n")-> str:
+
+    return re.split(sep, text.strip())
 
 # Get all the sentences of the entire corpus | used for separated corpus like brown
 def get_all_sents(files):
@@ -75,10 +81,12 @@ def tagged_sents(sents) -> str:
 
 # Function to generate a new corpus from a larger one with a smaller number of sentences
 # Max is by default == 2000
-def corpus_light(sents, max = 2000):
+def corpus_light(sents, start = 0, max = 2000):
     
     new_sents = []
-    for i in range(0, max):
+
+    print(f"Sentences: {start} => {max + start}")
+    for i in range(start, max + start):
         new_sents.append(sents[i])
 
     new_corpus = open("corpus_light", "w")
@@ -88,6 +96,32 @@ def corpus_light(sents, max = 2000):
 def compress_tags(sentences):
     new_sentences=[]
     new_s=""
+    text =""
+    for s in sentences : text = text + s + "\n"
+        
+    text = text.replace("dts", "dt").replace("dti", "dt").replace("dtx", "dt")
+    text = text.replace("abn","ab").replace("abx", "ab").replace("abl", "ab")
+    text = text.replace("-tl", "")
+    text = text.replace("-hl", "")
+    #text = text.replace("+", " ")
+
+    # concat_tags = ['PPSS BER', 'PPSS BEM', 'PPS HVZ', 'PPSS MD', 'PPS BEZ', 'PPSS HVD', 'MD HV', 'DT BEZ',
+    #                'EX BEZ', 'PPSS HV', 'PPS MD', 'NP BEZ', 'PN HVZ', 'WPS BEZ', 'RB BEZ', 'VB PPO', 'WDT BEZ',
+    #                'VB IN', 'VBG TO', 'NN HVZ', 'VBN TO', 'NN BEZ', 'WDT HVZ', 'WRB BEZ', 'WPS MD', 'NN MD',
+    #                'JJR CS', 'PPS HVD', 'VB RP', 'EX MD', 'EX HVD', 'WPS HVZ', 'PN MD', 'VB TO', 'DT MD',
+    #                'HV TO', 'MD TO', 'MD PPSS', 'NR MD', 'NN IN', 'RP IN', 'PN BEZ', 'WPS HVD', 'WDT DOD',
+    #                'WRB DO', 'WRB IN', 'NP HVZ', 'WRB DOD', 'WRB MD', 'EX HVZ', 'PPSS VB', 'WRB BER', 'NNS MD',
+    #                'PPSS BEZ*', 'RBR CS', 'NP MD', 'TO VB', 'DO PPSS', 'VB AT', 'WRB DOZ',
+    #                'DT BEZ', 'RB CS', 'WRB DOD*', 'WDT BER', 'PN HVD']
+    
+    # for c_t in concat_tags :
+    #     tag_plus = c_t.lower().replace(" ","+")
+    #     text = text.replace(" "+c_t.lower()+" "," "+tag_plus+" ")
+    #     text = text.replace(" "+c_t.lower()+"\n"," "+tag_plus+"\n")
+    #     text = text.replace("\n"+c_t.lower()+" ","\n"+tag_plus+" ")
+    #     text = text.replace("\n"+c_t.lower()+"\n","\n"+tag_plus+"\n")
+        
+    sentences = text.split("\n")
     for s in sentences:
         new_s=""
         tag = s.split()
@@ -109,62 +143,46 @@ def compress_tags(sentences):
                     tag[i]="fs" #foreign sentence
             if("nc"in tag[i]):#many word tagged in nc are normal words 
                  tag[i] = tag[i].replace("-nc","")
-            #case of title
-            if("tl"in tag[i]):
+            # case of juccessive np ex : A./np B./np junio/np => np np np ==> np
+            if("np"== tag[i]):
                 j=i
-                while(j+1<len(tag)and"tl"in tag[j+1] ):
+                while(j+1<len(tag)and"np"== tag[j+1]):
                     j=j+1
-                if(j<len(tag)):
-                    i=j
-                    tag[i]="tl" #title
-                else:
-                    i=j-1
-                    tag[i]="tl" #title
-            #case of headline
-            if("hl"in tag[i]):
-                j=i
-                while(j+1<len(tag)and"hl"in tag[j+1]):
-                    j=j+1
-                if(j<len(tag)):
-                    i=j
-                    tag[i]="hl" #headline
-                else:
-                    i=j-1
-                    tag[i]="hl" #headline
-            
-            #until that point thers no tag that contains + and - in the same time 
-            # seperate suffixes {$,s,+___,*}
-            #starting with * ... thers 2 wordt with + and * at the same time 'tain't = it aint = it is not (pps+bez+*)
-                                                                            #whyn't = why didn't = why did not 
-            
-            #if("+" in tag[i]):
-                #"tag[i] = tag[i].replace("+"," ") # the 2nd part of the tag cant be a start of rule so well check it in n_gram
-            
-            #case of np 
+                if(i!=j):
+                    if(j<len(tag)):
+                        i=j
+                        tag[i]="np" 
+                    else:
+                        i=j-1
+                        tag[i]="np" 
+                        
             new_s = new_s+tag[i]+" "
             i=i+1
         new_sentences.append(new_s.strip())
         
     return new_sentences
 
-# Print iterations progress
-def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
-    """
-    Call in a loop to create terminal progress bar
-    @params:
-        iteration   - Required  : current iteration (Int)
-        total       - Required  : total iterations (Int)
-        prefix      - Optional  : prefix string (Str)
-        suffix      - Optional  : suffix string (Str)
-        decimals    - Optional  : positive number of decimals in percent complete (Int)
-        length      - Optional  : character length of bar (Int)
-        fill        - Optional  : bar fill character (Str)
-        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
-    """
-    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
-    filledLength = int(length * iteration // total)
-    bar = fill * filledLength + '-' * (length - filledLength)
-    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
-    # Print New Line on Complete
-    if iteration == total: 
-        print()
+def prune(text):
+
+    text = text.replace("dts", "dt").replace("dti", "dt").replace("dtx", "dt")
+    text = text.replace("abn","ab").replace("abx", "ab").replace("abl", "ab")
+    text = text.replace("-tl", "")
+    text = text.replace("-hl", "")
+
+    # concat_tags = ['PPSS BER', 'PPSS BEM', 'PPS HVZ', 'PPSS MD', 'PPS BEZ', 'PPSS HVD', 'MD HV', 'DT BEZ',
+    #                'EX BEZ', 'PPSS HV', 'PPS MD', 'NP BEZ', 'PN HVZ', 'WPS BEZ', 'RB BEZ', 'VB PPO', 'WDT BEZ',
+    #                'VB IN', 'VBG TO', 'NN HVZ', 'VBN TO', 'NN BEZ', 'WDT HVZ', 'WRB BEZ', 'WPS MD', 'NN MD',
+    #                'JJR CS', 'PPS HVD', 'VB RP', 'EX MD', 'EX HVD', 'WPS HVZ', 'PN MD', 'VB TO', 'DT MD',
+    #                'HV TO', 'MD TO', 'MD PPSS', 'NR MD', 'NN IN', 'RP IN', 'PN BEZ', 'WPS HVD', 'WDT DOD',
+    #                'WRB DO', 'WRB IN', 'NP HVZ', 'WRB DOD', 'WRB MD', 'EX HVZ', 'PPSS VB', 'WRB BER', 'NNS MD',
+    #                'PPSS BEZ*', 'RBR CS', 'NP MD', 'TO VB', 'DO PPSS', 'VB AT', 'WRB DOZ',
+    #                'DT BEZ', 'RB CS', 'WRB DOD*', 'WDT BER', 'PN HVD']
+    
+    # for c_t in concat_tags :
+    #     tag_plus = c_t.lower().replace(" ","+")
+    #     text = text.replace(" "+c_t.lower()+" "," "+tag_plus+" ")
+    #     text = text.replace(" "+c_t.lower()+"\n"," "+tag_plus+"\n")
+    #     text = text.replace("\n"+c_t.lower()+" ","\n"+tag_plus+" ")
+    #     text = text.replace("\n"+c_t.lower()+"\n","\n"+tag_plus+"\n")
+
+    return text

@@ -118,6 +118,9 @@
     options:options
     application: application
     analysisBtn: analysisBtn
+    slideVal: slideVal
+    slider:slider
+    results:results
 
     Accordion:
         orientation: "vertical"
@@ -139,7 +142,7 @@
                     text: "[color=ff0000]========== Note =========[/color]"
                     size_hint: (1, 0.1)
                 Label:
-                    text: '''The imported Corpus must be tagged and bla bla bla...Once the training starts the old grammar will be lost'''
+                    text: '''The imported Corpus must be tagged in a free text just like the brown corpus...'''
                     size_hint: (1, 0.2)
                     background_color: (0, 0, 0,0)
                     canvas.before:
@@ -150,6 +153,28 @@
                             pos: self.pos
                     color: (136, 150, 150, 1)
                     size_hint: (1, 0.1)
+                BoxLayout:
+                    size_hint: (1, 0.3)
+                    orientation: "vertical"
+                    padding: 16
+                    Label:
+                        id: slideVal
+                        text: "Specify the training percentage of the corpus"
+                        background_color: (0, 0, 0,0)
+                        canvas.before:
+                            Color:
+                                rgba: self.background_color
+                            Rectangle:
+                                size: self.size
+                                pos: self.pos
+                        color: (136, 150, 150, 1)
+                    Slider:
+                        id: slider
+                        min: 50
+                        max: 75
+                        step: 1
+                        orientation: "horizontal"
+                        on_value: root.slide_it(*args)
                 Button:
                     text: "IMPORT & TRAIN"
                     font_size: 14
@@ -160,6 +185,16 @@
                 BoxLayout:
                     orientation: "vertical"
                     size_hint: (1, 0.6)
+                    Label:
+                        id: results
+                        background_color: (0, 0, 0,0)
+                        canvas.before:
+                            Color:
+                                rgba: self.background_color
+                            Rectangle:
+                                size: self.size
+                                pos: self.pos
+                        color: (136, 150, 150, 1)
         AccordionItem:
             title: "Application"
             id: application
@@ -180,7 +215,7 @@
                             multiline:True
                             padding: 8
                             foreground_color: (95/255, 116/255, 112/255, 1)
-                            hint_text: "Enter a text and click Generate Button to auto generate grammar"
+                            hint_text: "Enter a text and click Analysis Button to auto generate grammar"
                             hint_text_color: (95/255, 116/255, 112/255, 0.7)
                         RecycleView:
                             id: sents_rv

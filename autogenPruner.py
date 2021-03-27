@@ -27,29 +27,40 @@ def separate_tags(sent):
             print(sent)
 
 def regularize_corpus(path):
-    #the grammer of the title and the headline wil be separated in a diff file ad generated ceparately 
-    #as for hl ... it comes only in a separated sentence so we just omet it 
-    #for title we replace it with tl tag
-    #for foreign sentence we dont generate its grammer we just replace it with the tag fw if its more then one word
-    #for sentences between cotes they will be written in there own line 
-    #each sentence ends with ./.
-    
-    #open the file in string and correct it then rewrit in in the same file 
-    f = open(path)
-    file_contenante = f.read()
-    f.close()
-    file_contenante = file_contenante.replace("ppss+ber-n ","ppss+ber ")
-    file_contenante = file_contenante.replace("t'hi-im/in+ppo ","to/in him/ppo ")
-    file_contenante = file_contenante.replace("you's/ppss+bez ","you/ppss are/ber ") #me and you are (we can't write you're)
-    file_contenante = file_contenante.replace("\n","_")
-    list_quotes=re.findall("``/``.+?''/''",file_contenante)
-    file_contenante=re.sub("``/``.+?''/''","/quotes",file_contenante)
-    #cot -> ``/`` G ''/'' 
-    #G -> one of rule_base |one of rule_base G 
-    for quote in list_quotes:
-        quote=re.sub("``/``|''/''","",quote)
-        file_contenante =file_contenante +"_"+quote
-    file_contenante = file_contenante.replace("_","\n")
-    ########## will stop here the pre processing --- hl tl fw deal with in generation of grammer ############
-    f = open(path, "w")    
-    f.write(file_contenante)
+        #the grammer of the title and the headline wil be separated in a diff file ad generated ceparately 
+        #as for hl ... it comes only in a separated sentence so we just omet it 
+        #for title we replace it with tl tag
+        #for foreign sentence we dont generate its grammer we just replace it with the tag fw if its more then one word
+        #for sentences between cotes they will be written in there own line 
+        #each sentence ends with ./.
+        
+        #open the file in string and correct it then rewrit in in the same file 
+        f = open(path)
+        file_content = f.read()
+        f.close()
+        
+        #meanless tag -n
+        file_content = file_content.replace("ppss+ber-n ","ppss+ber ")
+        #wrong spelling mistake that leads to concatination between 2 tags that should not be contatinated
+        file_content = file_content.replace("t'hi-im/in+ppo ","to/in him/ppo ")
+        #me and you are (we can't write you're)
+        file_content = file_content.replace("you's/ppss+bez ","you/ppss are/ber ") 
+        # delete file cn16 manually cause it contains a lot of spelling errors and uknown words 
+        
+        file_content = file_content.replace("\n","_")
+        
+        list_quotes=re.findall("``/``.+?''/''",file_content) 
+        file_content=re.sub("``/``.+?''/''","/quotes",file_content)
+        for quote in list_quotes:
+            quote=re.sub("``/``|''/''","",quote)
+            file_content =file_content +"_"+quote
+        list_brack=re.findall("\(/\(.+?\)/\)",file_content) 
+        file_content=re.sub("\(/\(.+?\)/\)","/brackets",file_content)
+        for brack in list_brack:
+            brack=re.sub("\(/\(|\)/\)","",brack)
+            file_content =file_content +"_"+brack
+        
+        file_content = file_content.replace("_","\n")
+        # ########## will stop here the pre processing --- hl tl fw deal with in generation of grammer ############
+        f = open(path,"w")    
+        f.write(file_content)
